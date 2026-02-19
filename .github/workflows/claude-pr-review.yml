@@ -1,0 +1,26 @@
+# =============================================================================
+# Claude PR Review — Auto-deployed by org setup script
+# This is a thin caller that invokes the centralized reusable workflow.
+# To customize, add inputs (model, custom_prompt) — see shared-workflows README.
+# =============================================================================
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  review:
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' &&
+       contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' &&
+       contains(github.event.comment.body, '@claude'))
+    uses: Ositech-Communications-Inc/shared-workflows/.github/workflows/claude-review.yml@main
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
